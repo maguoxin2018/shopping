@@ -2,8 +2,11 @@ package com.neuedu.dao;
 
 import com.neuedu.pojo.Product;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
+
 @Mapper
 public interface ProductMapper {
     /**
@@ -45,4 +48,19 @@ public interface ProductMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Product record);
+
+    /**
+     *     更新商品状态
+     */
+    int updateStatusByProduct(Product product);
+    /**
+     *     后台----搜索商品，根据商品id 或者 商品名（模糊查询）
+     */
+    List<Product> selectproductByProductIdAndProductName(@Param(value = "productId")Integer productId,
+                                                         @Param(value = "productName")String productName);
+    /**
+     *     前台---搜索商品，根据商品id 或者 商品名（模糊查询）
+     */
+    List<Product> selectproductportal(@Param(value = "date")Set<Integer> date,
+                                      @Param(value = "keyword")String keyword);
 }

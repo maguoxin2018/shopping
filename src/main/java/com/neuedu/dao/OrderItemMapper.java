@@ -45,4 +45,14 @@ public interface OrderItemMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(OrderItem record);
+
+    /**
+     * 订单明细批量插入
+     */
+    int insertbatch(List<OrderItem> orderItemList);
+
+    /**
+     * 根据订单号查询
+     */
+    List<OrderItem> selectOrderItemByorderNo(Long orderNo);
 }

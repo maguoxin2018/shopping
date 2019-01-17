@@ -2,6 +2,7 @@ package com.neuedu.dao;
 
 import com.neuedu.pojo.Order;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 @Mapper
@@ -45,4 +46,18 @@ public interface OrderMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Order record);
+
+    /**
+     * 根据用户id和订单号查询订单信息
+     */
+    Order selectOrderByuserIdAndorderNo (@Param("userId") Integer userId ,@Param("orderNo") Long orderNo);
+
+    /**
+     * 根据用户id查询订单
+     */
+    List<Order> selectOrderByuserId(Integer userId);
+    /**
+     * 根据订单号查询订单
+     */
+    Order selectOrderByorderNo(Long orderNo);
 }

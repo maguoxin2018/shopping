@@ -45,4 +45,11 @@ public interface CategoryMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Category record);
+
+    /**
+     *    查询子类
+     */
+    List<Category> selectChildCategoryByCategoryId(Integer categoryId);
+
+
 }

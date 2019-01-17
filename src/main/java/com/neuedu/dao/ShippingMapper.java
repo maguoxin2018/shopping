@@ -2,6 +2,7 @@ package com.neuedu.dao;
 
 import com.neuedu.pojo.Shipping;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 @Mapper
@@ -45,4 +46,17 @@ public interface ShippingMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Shipping record);
+
+
+    /**
+     *     修改地址
+     * @mbggenerated
+     */
+    int updateByselectivkey(Shipping shipping);
+
+    /**
+     * 根据用户id和地址id删除地址信息
+     */
+    int deleteByuserIdAndshippingId(@Param("userId")Integer userId,
+                                    @Param("shippingId")Integer shippingId);
 }
