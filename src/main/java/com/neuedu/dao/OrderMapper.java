@@ -60,4 +60,8 @@ public interface OrderMapper {
      * 根据订单号查询订单
      */
     Order selectOrderByorderNo(Long orderNo);
+    /**
+     * 根据创建时间查询订单
+     */
+    List<Order> selectOrderByCreateTime(@Param("orderStatus")Integer orderStatus,@Param("time")String time);
 }

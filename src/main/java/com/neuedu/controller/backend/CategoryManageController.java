@@ -5,6 +5,7 @@ import com.neuedu.common.ServerResponse;
 import com.neuedu.pojo.UserInfo;
 import com.neuedu.service.ICategoryservice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +23,8 @@ public class CategoryManageController {
 
 
     //    1.获取品类子节点(平级)
-    @RequestMapping(value = "/get_category.do")
-    public ServerResponse get_category(HttpSession session,Integer categoryId){
+    @RequestMapping(value = "/get_category.do/{categoryId}")
+    public ServerResponse get_category(HttpSession session,@PathVariable Integer categoryId){
         UserInfo userInfo = (UserInfo)session.getAttribute(Const.CURRENTUSER);
         if (userInfo == null){
             return ServerResponse.createServerResponseByFail(Const.ResponseCode.NEED_LOGIN.getCode(),Const.ResponseCode.NEED_LOGIN.getDesc());
@@ -53,8 +54,8 @@ public class CategoryManageController {
 
 
     //修改节点
-    @RequestMapping(value = "/set_category_name.do")
-    public ServerResponse set_category_name(HttpSession session, Integer categoryId, String categoryName){
+    @RequestMapping(value = "/set_category_name.do/{categoryId}/{categoryName}")
+    public ServerResponse set_category_name(HttpSession session, @PathVariable Integer categoryId,@PathVariable String categoryName){
         UserInfo userInfo = (UserInfo)session.getAttribute(Const.CURRENTUSER);
         if (userInfo == null){
             return ServerResponse.createServerResponseByFail(Const.ResponseCode.NEED_LOGIN.getCode(), Const.ResponseCode.NEED_LOGIN.getDesc());
@@ -68,9 +69,9 @@ public class CategoryManageController {
 
 
     //获取当前分类id及递归子节点categoryId
-    @RequestMapping(value = "/get_deep_category.do")
+    @RequestMapping(value = "/get_deep_category.do/{categoryId}")
     public ServerResponse get_deep_category(HttpSession session,
-                                            Integer categoryId){
+                                            @PathVariable Integer categoryId){
         UserInfo userInfo = (UserInfo)session.getAttribute(Const.CURRENTUSER);
         if (userInfo == null){
             return ServerResponse.createServerResponseByFail(Const.ResponseCode.NEED_LOGIN.getCode(), Const.ResponseCode.NEED_LOGIN.getDesc());

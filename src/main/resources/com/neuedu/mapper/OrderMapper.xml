@@ -41,8 +41,7 @@
       create_time, update_time)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=BIGINT}, 
       #{shippingId,jdbcType=INTEGER}, #{payment,jdbcType=DECIMAL}, #{paymentType,jdbcType=INTEGER}, 
-      #{postage,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{paymentTime,jdbcType=TIMESTAMP}, 
-      #{sendTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{closeTime,jdbcType=TIMESTAMP}, 
+      #{postage,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, null,null,null,null,
       now(), now())
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.neuedu.pojo.Order" >
@@ -117,5 +116,16 @@
     payment_time, send_time, end_time, close_time, create_time, update_time
     from neuedu_order
     where order_no=#{orderNo}
+  </select>
+
+
+  <!--
+           根据创建时间查询订单
+        -->
+  <select id="selectOrderByCreateTime"  parameterType="map" resultMap="BaseResultMap" >
+    select id, user_id, order_no, shipping_id, payment, payment_type, postage, status,
+    payment_time, send_time, end_time, close_time, create_time, update_time
+    from neuedu_order
+    where status=#{orderStatus}  and  <![CDATA[create_time<=#{time}]]>
   </select>
 </mapper>

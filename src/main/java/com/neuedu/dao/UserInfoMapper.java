@@ -75,4 +75,8 @@ public interface UserInfoMapper {
      * 更新用户信息
      */
     int updateUsermessage(UserInfo userInfo);
+    /**
+     * 查询token
+     */
+    UserInfo findInfoByToken(String token);
 }

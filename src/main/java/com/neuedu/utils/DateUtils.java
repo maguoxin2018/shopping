@@ -8,7 +8,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class DateUtils {
-    private static final String STANDARD_FORMAT="yyyy-MM-dd HH:mm:ss";
+    public static final String STANDARD_FORMAT="yyyy-MM-dd HH:mm:ss";
     //将date转化为字符串
     public static String dateToString(Date date,String formate){
         DateTime dateTime = new DateTime(date);

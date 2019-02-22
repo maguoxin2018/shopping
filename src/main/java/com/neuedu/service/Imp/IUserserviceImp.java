@@ -4,11 +4,18 @@ import com.neuedu.common.Const;
 import com.neuedu.common.ServerResponse;
 import com.neuedu.dao.UserInfoMapper;
 import com.neuedu.pojo.UserInfo;
+import com.neuedu.redis.RedisApi;
+import com.neuedu.redis.RedisPool;
+import com.neuedu.redis.RedisProperties;
 import com.neuedu.service.IUserservice;
 import com.neuedu.utils.MD5Utils;
 import com.neuedu.utils.TokenCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.util.UUID;
 
@@ -16,6 +23,10 @@ import java.util.UUID;
 public class IUserserviceImp implements IUserservice {
     @Autowired
     UserInfoMapper  UserInfoMapper;
+    @Autowired
+    RedisApi redisApi;
+    @Autowired
+    RedisProperties redisProperties;
 
 
 //  登录
@@ -38,18 +49,22 @@ public class IUserserviceImp implements IUserservice {
         if (userInfo == null){
             return ServerResponse.createServerResponseByFail("密码错误");
         }
+        //生成token
+        String token = MD5Utils.getMD5Code(username+password);
+        userInfo.setToken(token);
+        int i = UserInfoMapper.updateByPrimaryKey(userInfo);
+        if (i<0){
+            System.out.println("更新token失败");
+            return ServerResponse.createServerResponseByFail("更新token失败");
+        }
         userInfo.setPassword("");
+        System.out.println(redisProperties.getMaxIdle());
         return ServerResponse.createServerResponseBySuccess(userInfo,null);
     }
 
 
 
-
 //     注册
-
-
-
-
     @Override
     public ServerResponse register(UserInfo userInfo) {
         //step:1    非空校验
@@ -121,7 +136,8 @@ public class IUserserviceImp implements IUserservice {
         }
         //        setp:2   服务端生成一个token保存并将它传给客户端
         String forgettoken = UUID.randomUUID().toString();
-        TokenCache.set(username,forgettoken);
+//        TokenCache.set(username,forgettoken);
+        redisApi.set(username,forgettoken);
         return ServerResponse.createServerResponseBySuccess(forgettoken,null);
     }
 
@@ -141,7 +157,8 @@ public class IUserserviceImp implements IUserservice {
             return ServerResponse.createServerResponseByFail("token不能为空");
         }
 //       setp：2  token校验
-        String s = TokenCache.get(username);
+//        String s = TokenCache.get(username);
+        String s = redisApi.get(username);
         if (s ==null){
             return ServerResponse.createServerResponseByFail("token过期");
         }
@@ -226,5 +243,17 @@ public class IUserserviceImp implements IUserservice {
     @Override
     public UserInfo selectUserByUserid(Integer userId) {
         return UserInfoMapper.selectByPrimaryKey(userId);
+    }
+
+
+
+//      查询token
+    @Override
+    public ServerResponse findInfoByToken(String token) {
+        UserInfo infoByToken = UserInfoMapper.findInfoByToken(token);
+        if (infoByToken==null||infoByToken.equals("")){
+            return ServerResponse.createServerResponseByFail("失败");
+        }
+        return ServerResponse.createServerResponseBySuccess(infoByToken,null);
     }
 }

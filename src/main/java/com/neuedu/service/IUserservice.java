@@ -22,4 +22,6 @@ public interface IUserservice {
     ServerResponse update_information(UserInfo user);
 //    根据用户id查询个人信息
     UserInfo selectUserByUserid(Integer userId);
+//     查询token
+    ServerResponse findInfoByToken(String token);
 }

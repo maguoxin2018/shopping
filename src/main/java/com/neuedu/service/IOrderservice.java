@@ -22,4 +22,6 @@ public interface IOrderservice {
     ServerResponse callback(Map<String,String> map);
     //查看订单支付状态
     ServerResponse query_order_pay_status(Long orderNo);
+    //根据创建时间查询订单
+    void closeOrder (String time);
 }

@@ -7,6 +7,7 @@ import com.neuedu.pojo.Product;
 import com.neuedu.pojo.UserInfo;
 import com.neuedu.service.IProductservice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,8 +40,8 @@ public class ProductManageController {
 
 
 //      管理商品上下架
-    @RequestMapping(value = "/set_sale_status.do")
-    public ServerResponse set_sale_status(HttpSession session,Integer productId,Integer status){
+    @RequestMapping(value = "/set_sale_status.do/{productId}/{status}")
+    public ServerResponse set_sale_status(HttpSession session, @PathVariable Integer productId,@PathVariable Integer status){
     //        判断用户是否登录
         UserInfo userInfo = (UserInfo)session.getAttribute(Const.CURRENTUSER);
         if (userInfo == null){
@@ -56,7 +57,7 @@ public class ProductManageController {
 
 
 //      商品详情
-    @RequestMapping(value = "/detail.do")
+    @RequestMapping(value = "/detail.do/{productId}")
     public ServerResponse detail(HttpSession session,Integer productId){
     //        判断用户是否登录
         UserInfo userInfo = (UserInfo)session.getAttribute(Const.CURRENTUSER);
@@ -74,7 +75,7 @@ public class ProductManageController {
 
 
 //      查看商品列表（分页）
-    @RequestMapping(value = "/list.do")
+    @RequestMapping(value = "/list.do/")
     public ServerResponse list(HttpSession session,
                                @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
                                @RequestParam(value = "pageSize",required = false,defaultValue = "10")Integer pageSize){

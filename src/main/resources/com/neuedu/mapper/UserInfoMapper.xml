@@ -54,7 +54,8 @@
       answer = #{answer,jdbcType=VARCHAR},
       role = #{role,jdbcType=INTEGER},
       update_time = now(),
-      ip = #{ip,jdbcType=VARCHAR}
+      ip = #{ip,jdbcType=VARCHAR},
+      token=#{token}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -141,4 +142,14 @@
         </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <!--
+        查询token
+       -->
+  <select id="findInfoByToken" parameterType="String" resultMap="BaseResultMap">
+      select id, username, password, email, phone, question, answer, role, create_time, update_time, ip
+      from neuedu_user where token=#{token}
+  </select>
+
+
+
 </mapper>

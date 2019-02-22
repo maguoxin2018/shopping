@@ -5,6 +5,7 @@ import com.neuedu.common.ServerResponse;
 import com.neuedu.pojo.UserInfo;
 import com.neuedu.service.IUserservice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,8 +20,8 @@ public class UserManageController {
     IUserservice iUserservice;
 
     //    登录
-    @RequestMapping(value = "/login.do")
-    public ServerResponse login(String username, String password, HttpSession session){
+    @RequestMapping(value = "/login.do/{username}/{password}")
+    public ServerResponse login(@PathVariable String username, @PathVariable String password, HttpSession session){
         ServerResponse login = iUserservice.login(username, password);
         if (login.isSuccess()){
             UserInfo date = (UserInfo)login.getDate();

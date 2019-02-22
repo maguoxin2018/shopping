@@ -226,10 +226,36 @@ public class IOrderserviceImp implements IOrderservice {
         orderVO.setPayment(order.getPayment());
         orderVO.setPaymentType(order.getPaymentType());
         Const.PaymentEnum paymentEnum = Const.PaymentEnum.coedOf(order.getPaymentType());
-        if (paymentEnum!=null) {
+        if (paymentEnum != null) {
             orderVO.setPaymentTypeDesc(paymentEnum.getDesc());
         }
         orderVO.setOrderNo(order.getOrderNo());
+        if (order.getCloseTime()==null){
+            orderVO.setCloseTime("null");
+        }else
+        {
+            orderVO.setCloseTime(DateUtils.dateToString(order.getCloseTime()));
+        }
+        if (order.getEndTime()==null){
+            orderVO.setEndTime("null");
+        }else
+        {
+            orderVO.setEndTime(DateUtils.dateToString(order.getEndTime()));
+        }
+        if (order.getPaymentTime()==null){
+            orderVO.setPaymentTime("null");
+        }else
+        {
+            orderVO.setPaymentTime(DateUtils.dateToString(order.getPaymentTime()));
+        }
+        if (order.getSendTime()==null){
+            orderVO.setSendTime("null");
+        }
+        else
+        {
+            orderVO.setSendTime(DateUtils.dateToString(order.getSendTime()));
+        }
+        orderVO.setCreateTime(DateUtils.dateToString(order.getCreateTime()));
         return  orderVO;
     }
 
@@ -439,6 +465,32 @@ public class IOrderserviceImp implements IOrderservice {
             return ServerResponse.createServerResponseBySuccess(true,null);
         }
         return ServerResponse.createServerResponseByFail(false,null);
+    }
+
+
+//    根据创建时间查询订单
+    @Override
+    public void closeOrder(String time) {
+        //  查询未支付的订单
+        List<Order> orderList = orderMapper.selectOrderByCreateTime(Const.OrderCheckEnum.ORDER_UN_PAY.getCode(), time);
+        if (orderList!=null&&orderList.size()>0){
+            for (Order order :orderList) {
+                List<OrderItem> orderItemList = orderItemMapper.selectOrderItemByorderNo(order.getOrderNo());
+                if (orderItemList!=null&&orderItemList.size()>0){
+                    for (OrderItem orderItem :orderItemList) {
+                        Product product = productMapper.selectByPrimaryKey(orderItem.getProductId());
+                        if (product == null){
+                            continue;
+                        }
+                        product.setStock(product.getStock()+orderItem.getQuantity());
+                        productMapper.updateByPrimaryKey(product);
+                    }
+                }
+                order.setStatus(Const.OrderCheckEnum.ORDER_CANCELED.getCode());
+                order.setCloseTime(new Date());
+                orderMapper.updateByPrimaryKey(order);
+            }
+        }
     }
 
 
@@ -750,12 +802,6 @@ public class IOrderserviceImp implements IOrderservice {
                 break;
         }
     }
-
-
-
-
-
-
 
 
     // 测试当面付2.0生成支付二维码

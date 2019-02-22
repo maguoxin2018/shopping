@@ -6,10 +6,16 @@ import com.neuedu.pojo.UserInfo;
 import com.neuedu.service.IUserservice;
 import com.neuedu.service.Imp.IUserserviceImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
@@ -19,13 +25,20 @@ public class UserController {
     @Autowired
     IUserservice iUserservice;
 
+
+
 //    登录
-    @RequestMapping(value = "/login.do")
-    public ServerResponse login(String username, String password, HttpSession session){
+    @RequestMapping(value = "/login.do/{username}/{password}")
+    public ServerResponse login(@PathVariable String username,@PathVariable String password, HttpSession session, HttpServletResponse response){
         ServerResponse login = iUserservice.login(username, password);
         if (login.isSuccess()){
-            UserInfo date = (UserInfo)login.getDate();
-            session.setAttribute(Const.CURRENTUSER,date);
+            UserInfo userInfo = (UserInfo)login.getDate();
+            Cookie cookie = new Cookie("username",userInfo.getToken());
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(1000*60*3);
+            response.addCookie(cookie);
+            session.setAttribute(Const.CURRENTUSER,userInfo);
         }
         return login;
     }
@@ -38,20 +51,20 @@ public class UserController {
 
 
 //      根据用户名查询密保问题
-    @RequestMapping(value="/forget_get_question.do")
-    public ServerResponse forget_get_question(String username){
+    @RequestMapping(value="/forget_get_question.do/{username}")
+    public ServerResponse forget_get_question(@PathVariable String username){
         ServerResponse serverResponse = iUserservice.forget_get_question(username);
         return serverResponse;
     }
 
     //      提交问题答案
-    @RequestMapping(value="/forget_check_answer.do")
-    public ServerResponse forget_check_answer(String username,String question,String answer){
+    @RequestMapping(value="/forget_check_answer.do/{username}/{question}/{answer}")
+    public ServerResponse forget_check_answer(@PathVariable String username,@PathVariable String question,@PathVariable String answer){
         ServerResponse serverResponse = iUserservice.forget_check_answer(username,question,answer);
         return serverResponse;
     }
     //    重置密码
-    @RequestMapping(value="/forget_reset_password.do")
+    @RequestMapping(value="/forget_reset_password.do/{username}/{passwordNew}/{forgettoken}")
     public ServerResponse forget_reset_password(String username,String passwordNew,String forgettoken){
         ServerResponse serverResponse = iUserservice.forget_reset_password(username,passwordNew,forgettoken);
         return serverResponse;
@@ -59,8 +72,8 @@ public class UserController {
 
 
     //    检查用户名和邮箱是否有效
-    @RequestMapping(value="/check_valid.do")
-    public ServerResponse check_valid(String str,String type){
+    @RequestMapping(value="/check_valid.do/{str}/{type}")
+    public ServerResponse check_valid(@PathVariable String str,@PathVariable String type){
         ServerResponse serverResponse = iUserservice.check_valid(str,type);
         return serverResponse;
     }
@@ -80,8 +93,8 @@ public class UserController {
         return ServerResponse.createServerResponseBySuccess(userInfo,null);
     }
     //    登录状态修改密码
-    @RequestMapping(value="/reset_password.do")
-    public ServerResponse reset_password (HttpSession session,String passwordOld,String passwordNew){
+    @RequestMapping(value="/reset_password.do/{passwordOld}/{passwordNew}")
+    public ServerResponse reset_password (HttpSession session,@PathVariable String passwordOld,@PathVariable String passwordNew){
         UserInfo userInfo =(UserInfo) session.getAttribute(Const.CURRENTUSER);
         if (userInfo == null){
             return ServerResponse.createServerResponseByFail("用户未登录");
